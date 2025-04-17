@@ -7,12 +7,6 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Create log for storing TODOs
-const todoLog = fs.createWriteStream(path.join(__dirname, 'todo.log'), {flags: 'a'});
-todoLog.on('error', (err) => {
-  console.error('Error writing to todo log:', err);
-});
-
 // Middleware to parse JSON requests
 app.use(express.json());
 
@@ -63,9 +57,6 @@ app.post('/todos', (req, res) => {
   };
   
   todos.push(newTodo);
-
-  // Log every incoming TODO item in a 'todo.log' file @ the root of the project
-  todoLog.write(JSON.stringify(newTodo));
 
   // In your HW, you'd INSERT a row in your db table instead of writing to file or push to array!
 
