@@ -1,35 +1,46 @@
 
-document.getElementById('displayTodos').addEventListener('click', async () => {
-    const response = await fetch('/todos');
-    const todos = await response.json();
-    const display = document.getElementById('todoDisplay');
-    if (!display) return console.log('Element not found');
-    display.innerHTML = JSON.stringify(todos);
-  });
-  
+const displayTodos = async () => {
+  const response = await fetch('/todos');
+  const todos = await response.json();
+  const display = document.getElementById('todoDisplay');
+  if (!display) return console.log('Element not found');
+  display.innerHTML = JSON.stringify(todos, null, 2);
+}
 
-  // There a bunch of missing keywords in the following code, fix them to have the code work corretly!
-
-  document.getElementById('submitTodo').addEventListener('click', () => {
-    const name = document.getElementById('todoName').value;
-    const priority = document.getElementById('todoPriority').value || 'low';
-    const isFun = document.getElementById('todoIsFun').value || 'true';
-  
-    const todo = { name, priority, isFun };
-  
-    const response = fetch('/todos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(todo)
-    });
-  
-    const result = response.json();
+const submitTodos = async () => {
+  const nameElem = document.getElementById('todoName');
+  const priorityElem = document.getElementById('todoPriority')
+  const isFunElem = document.getElementById('todoIsFun');
+  const name = nameElem.value;
+  const priority = priorityElem.value || 'low';
+  const isFun = isFunElem.value || 'true';
+  const todo = { name, priority, isFun };
+  await fetch('/todos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(todo)
+  }).then((response) => response.json()).then(result =>{ 
     alert(`Todo added: ${JSON.stringify(result)}`);
+    [nameElem, priorityElem, isFunElem].forEach((field) => {
+      field.value = "";
+    });
   });
-  
-  document.getElementById('deleteTodo').addEventListener('click', () => {
-    const id = document.getElementById('todoIdToDelete').value;
-    const response =  fetch(`/todos/${id}`, { method: 'DELETE' });
-    const result = response.json();
+  displayTodos();
+}
+
+const deleteTodos = async () => {
+  const deleteBtnElem = document.getElementById('todoIdToDelete');
+  const id = deleteBtnElem.value;
+  await fetch(
+    `/todos/${id}`, { method: 'DELETE' }
+  ).then((response) => response.json()).then((result) => {
     alert(result.message);
+    deleteBtnElem.value = "";
+    displayTodos();
   });
+}
+
+document.getElementById('displayTodos').addEventListener('click', displayTodos);
+document.getElementById('submitTodo').addEventListener('click', submitTodos);
+document.getElementById('deleteTodo').addEventListener('click', deleteTodos);
+document.addEventListener("DOMContentLoaded", displayTodos);
