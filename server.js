@@ -5,11 +5,7 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database("todo.db", async (err) => {
-  if (err) console.error("Error opening database:", err.message);
-  else console.log("Connected to the todo database.");
-});
+const db = require('./database');
 
 // Middleware to parse JSON requests
 app.use(express.json());
